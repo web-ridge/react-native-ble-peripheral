@@ -2,7 +2,7 @@
  * @providesModule BLEPeripheral
  */
 
-'use strict';
+"use strict";
 
-var { NativeModules } = require('react-native');
+var { NativeModules } = require("react-native");
 module.exports = NativeModules.BLEPeripheral;
