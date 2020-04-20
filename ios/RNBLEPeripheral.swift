@@ -45,16 +45,16 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
         }
     }
     
-    @objc(addCharacteristicToService:uuid:permissions:properties:data:)
-    func addCharacteristicToService(_ serviceUUID: String, uuid: String, permissions: UInt, properties: UInt, data: String) {
-        let characteristicUUID = CBUUID(string: uuid)
-        let propertyValue = CBCharacteristicProperties(rawValue: properties)
-        let permissionValue = CBAttributePermissions(rawValue: permissions)
-        let byteData: Data = data.data(using: .utf8)!
-        let characteristic = CBMutableCharacteristic( type: characteristicUUID, properties: propertyValue, value: byteData, permissions: permissionValue)
-        servicesMap[serviceUUID]?.characteristics?.append(characteristic)
-        print("added characteristic to service")
-    }
+//    @objc(addCharacteristicToService:uuid:permissions:properties:data:)
+//    func addCharacteristicToService(_ serviceUUID: String, uuid: String, permissions: UInt, properties: UInt, data: String) {
+//        let characteristicUUID = CBUUID(string: uuid)
+//        let propertyValue = CBCharacteristicProperties(rawValue: properties)
+//        let permissionValue = CBAttributePermissions(rawValue: permissions)
+//        let byteData: Data = data.data(using: .utf8)!
+//        let characteristic = CBMutableCharacteristic( type: characteristicUUID, properties: propertyValue, value: byteData, permissions: permissionValue)
+//        servicesMap[serviceUUID]?.characteristics?.append(characteristic)
+//        print("added characteristic to service")
+//    }
     
     @objc func start(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         if (manager.state != .poweredOn) {
@@ -78,70 +78,70 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
         print("called stop")
     }
 
-    @objc(sendNotificationToDevices:characteristicUUID:data:)
-    func sendNotificationToDevices(_ serviceUUID: String, characteristicUUID: String, data: Data) {
-        if(servicesMap.keys.contains(serviceUUID) == true){
-            let service = servicesMap[serviceUUID]!
-            let characteristic = getCharacteristicForService(service, characteristicUUID)
-            if (characteristic == nil) { alertJS("service \(serviceUUID) does NOT have characteristic \(characteristicUUID)") }
-
-            let char = characteristic as! CBMutableCharacteristic
-            char.value = data
-            let success = manager.updateValue( data, for: char, onSubscribedCentrals: nil)
-            if (success){
-                print("changed data for characteristic \(characteristicUUID)")
-            } else {
-                alertJS("failed to send changed data for characteristic \(characteristicUUID)")
-            }
-
-        } else {
-            alertJS("service \(serviceUUID) does not exist")
-        }
-    }
+//    @objc(sendNotificationToDevices:characteristicUUID:data:)
+//    func sendNotificationToDevices(_ serviceUUID: String, characteristicUUID: String, data: Data) {
+//        if(servicesMap.keys.contains(serviceUUID) == true){
+//            let service = servicesMap[serviceUUID]!
+//            let characteristic = getCharacteristicForService(service, characteristicUUID)
+//            if (characteristic == nil) { alertJS("service \(serviceUUID) does NOT have characteristic \(characteristicUUID)") }
+//
+//            let char = characteristic as! CBMutableCharacteristic
+//            char.value = data
+//            let success = manager.updateValue( data, for: char, onSubscribedCentrals: nil)
+//            if (success){
+//                print("changed data for characteristic \(characteristicUUID)")
+//            } else {
+//                alertJS("failed to send changed data for characteristic \(characteristicUUID)")
+//            }
+//
+//        } else {
+//            alertJS("service \(serviceUUID) does not exist")
+//        }
+//    }
     
     //// EVENTS
 
     // Respond to Read request
-    func peripheralManager(peripheral: CBPeripheralManager, didReceiveReadRequest request: CBATTRequest)
-    {
-        let characteristic = getCharacteristic(request.characteristic.uuid)
-        if (characteristic != nil){
-            request.value = characteristic?.value
-            manager.respond(to: request, withResult: .success)
-        } else {
-            alertJS("cannot read, characteristic not found")
-        }
-    }
+//    func peripheralManager(peripheral: CBPeripheralManager, didReceiveReadRequest request: CBATTRequest)
+//    {
+//        let characteristic = getCharacteristic(request.characteristic.uuid)
+//        if (characteristic != nil){
+//            request.value = characteristic?.value
+//            manager.respond(to: request, withResult: .success)
+//        } else {
+//            alertJS("cannot read, characteristic not found")
+//        }
+//    }
 
     // Respond to Write request
-    func peripheralManager(peripheral: CBPeripheralManager, didReceiveWriteRequests requests: [CBATTRequest])
-    {
-        for request in requests
-        {
-            let characteristic = getCharacteristic(request.characteristic.uuid)
-            if (characteristic == nil) { alertJS("characteristic for writing not found") }
-            if request.characteristic.uuid.isEqual(characteristic?.uuid)
-            {
-                let char = characteristic as! CBMutableCharacteristic
-                char.value = request.value
-            } else {
-                alertJS("characteristic you are trying to access doesn't match")
-            }
-        }
-        manager.respond(to: requests[0], withResult: .success)
-    }
+//    func peripheralManager(peripheral: CBPeripheralManager, didReceiveWriteRequests requests: [CBATTRequest])
+//    {
+//        for request in requests
+//        {
+//            let characteristic = getCharacteristic(request.characteristic.uuid)
+//            if (characteristic == nil) { alertJS("characteristic for writing not found") }
+//            if request.characteristic.uuid.isEqual(characteristic?.uuid)
+//            {
+//                let char = characteristic as! CBMutableCharacteristic
+//                char.value = request.value
+//            } else {
+//                alertJS("characteristic you are trying to access doesn't match")
+//            }
+//        }
+//        manager.respond(to: requests[0], withResult: .success)
+//    }
 
     // Respond to Subscription to Notification events
-    func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic) {
-        let char = characteristic as! CBMutableCharacteristic
-        print("subscribed centrals: \(String(describing: char.subscribedCentrals))")
-    }
-
-    // Respond to Unsubscribe events
-    func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
-        let char = characteristic as! CBMutableCharacteristic
-        print("unsubscribed centrals: \(String(describing: char.subscribedCentrals))")
-    }
+//    func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didSubscribeTo characteristic: CBCharacteristic) {
+//        let char = characteristic as! CBMutableCharacteristic
+//        print("subscribed centrals: \(String(describing: char.subscribedCentrals))")
+//    }
+//
+//    // Respond to Unsubscribe events
+//    func peripheralManager(_ peripheral: CBPeripheralManager, central: CBCentral, didUnsubscribeFrom characteristic: CBCharacteristic) {
+//        let char = characteristic as! CBMutableCharacteristic
+//        print("unsubscribed centrals: \(String(describing: char.subscribedCentrals))")
+//    }
 
     // Service added
     func peripheralManager(_ peripheral: CBPeripheralManager, didAdd service: CBService, error: Error?) {
@@ -178,37 +178,37 @@ class BLEPeripheral: RCTEventEmitter, CBPeripheralManagerDelegate {
     
     //// HELPERS
 
-    func getCharacteristic(_ characteristicUUID: CBUUID) -> CBCharacteristic? {
-        for (uuid, service) in servicesMap {
-            for characteristic in service.characteristics ?? [] {
-                if (characteristic.uuid.isEqual(characteristicUUID) ) {
-                    print("service \(uuid) does have characteristic \(characteristicUUID)")
-                    if (characteristic is CBMutableCharacteristic) {
-                        return characteristic
-                    }
-                    print("but it is not mutable")
-                } else {
-                    alertJS("characteristic you are trying to access doesn't match")
-                }
-            }
-        }
-        return nil
-    }
+//    func getCharacteristic(_ characteristicUUID: CBUUID) -> CBCharacteristic? {
+//        for (uuid, service) in servicesMap {
+//            for characteristic in service.characteristics ?? [] {
+//                if (characteristic.uuid.isEqual(characteristicUUID) ) {
+//                    print("service \(uuid) does have characteristic \(characteristicUUID)")
+//                    if (characteristic is CBMutableCharacteristic) {
+//                        return characteristic
+//                    }
+//                    print("but it is not mutable")
+//                } else {
+//                    alertJS("characteristic you are trying to access doesn't match")
+//                }
+//            }
+//        }
+//        return nil
+//    }
 
-    func getCharacteristicForService(_ service: CBMutableService, _ characteristicUUID: String) -> CBCharacteristic? {
-        for characteristic in service.characteristics ?? [] {
-            if (characteristic.uuid.isEqual(characteristicUUID) ) {
-                print("service \(service.uuid) does have characteristic \(characteristicUUID)")
-                if (characteristic is CBMutableCharacteristic) {
-                    return characteristic
-                }
-                print("but it is not mutable")
-            } else {
-                alertJS("characteristic you are trying to access doesn't match")
-            }
-        }
-        return nil
-    }
+//    func getCharacteristicForService(_ service: CBMutableService, _ characteristicUUID: String) -> CBCharacteristic? {
+//        for characteristic in service.characteristics ?? [] {
+//            if (characteristic.uuid.isEqual(characteristicUUID) ) {
+//                print("service \(service.uuid) does have characteristic \(characteristicUUID)")
+//                if (characteristic is CBMutableCharacteristic) {
+//                    return characteristic
+//                }
+//                print("but it is not mutable")
+//            } else {
+//                alertJS("characteristic you are trying to access doesn't match")
+//            }
+//        }
+//        return nil
+//    }
 
     func getServiceUUIDArray() -> Array<CBUUID> {
         var serviceArray = [CBUUID]()
